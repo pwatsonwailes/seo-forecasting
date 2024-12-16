@@ -1,12 +1,19 @@
-import { Keyword, Portfolio } from '../types';
+import { Keyword, Portfolio, AppState, SeasonalityFactors } from '../types';
+import { DEFAULT_SEASONALITY } from './seasonality';
 
-export interface AppState {
-  keywords: Keyword[];
-  portfolios: Portfolio[];
-}
-
-export function exportState(keywords: Keyword[], portfolios: Portfolio[]): void {
-  const state: AppState = { keywords, portfolios };
+export function exportState(
+  keywords: Keyword[], 
+  portfolios: Portfolio[],
+  seasonality: SeasonalityFactors,
+  startMonth: number
+): void {
+  const state: AppState = { 
+    keywords, 
+    portfolios,
+    seasonality,
+    startMonth
+  };
+  
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   
@@ -25,6 +32,15 @@ export function parseImportedState(jsonString: string): AppState | null {
     if (!state.keywords || !state.portfolios) {
       throw new Error('Invalid state format');
     }
+    
+    // Handle backward compatibility for seasonality and startMonth
+    if (!state.seasonality) {
+      state.seasonality = DEFAULT_SEASONALITY;
+    }
+    if (typeof state.startMonth !== 'number') {
+      state.startMonth = 0;
+    }
+    
     return state;
   } catch (error) {
     console.error('Failed to parse imported state:', error);

@@ -1,18 +1,16 @@
-import React from 'react';
-
 interface MonthLabelsProps {
   months: number[];
   chartHeight: number;
   getX: (month: number) => number;
+  actualMonths: string[];
 }
 
-export function MonthLabels({ months, chartHeight, getX }: MonthLabelsProps) {
+export function MonthLabels({ months, chartHeight, getX, actualMonths }: MonthLabelsProps) {
   return (
     <>
       {months.map((month) => {
         const xPos = getX(month);
         
-        // Skip if position is invalid
         if (isNaN(xPos)) return null;
         
         return (
@@ -23,7 +21,7 @@ export function MonthLabels({ months, chartHeight, getX }: MonthLabelsProps) {
             textAnchor="middle"
             className="text-xs fill-gray-500"
           >
-            M{month}
+            {actualMonths[month].slice(0, 3)}
           </text>
         );
       })}

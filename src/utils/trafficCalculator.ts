@@ -1,3 +1,6 @@
+import { Keyword, Portfolio, TrafficData, SeasonalityFactors } from '../types';
+import { getActualMonth, getSeasonalityFactor } from './seasonality';
+
 const POSITION_TRAFFIC_SHARE: { [key: number]: number } = {
   1: 0.30,
   2: 0.13,
@@ -80,7 +83,9 @@ export function calculateMonthlyTraffic(
   keywords: Keyword[],
   portfolios: Portfolio[],
   errorMargin: number = 0.2,
-  selectedPortfolios: string[] = []
+  selectedPortfolios: string[] = [],
+  seasonality: SeasonalityFactors = {},
+  startMonth: number = 0
 ): TrafficData[] {
   const startErrorMargin = 0.05;
 
@@ -92,14 +97,17 @@ export function calculateMonthlyTraffic(
       : keywords;
 
     filteredKeywords.forEach(keyword => {
-      // Get lowest positions from all matching portfolios
       const { startPosition, endPosition } = getLowestPositions(keyword, portfolios);
-      
       const interpolatedPos = interpolatePosition(startPosition, endPosition, month);
       const trafficShare = calculateTrafficShare(interpolatedPos);
-      totalTraffic += keyword.searchVolume * trafficShare;
+      
+      // Apply seasonality factor
+      const actualMonth = getActualMonth(startMonth, month);
+      const seasonalityFactor = getSeasonalityFactor(actualMonth, seasonality);
+      totalTraffic += keyword.searchVolume * trafficShare * seasonalityFactor;
     });
 
+    // Calculate error margin that grows over time
     const currentErrorMargin = startErrorMargin + 
       ((errorMargin - startErrorMargin) * (month / 12));
 
@@ -107,7 +115,8 @@ export function calculateMonthlyTraffic(
       month,
       expectedTraffic: totalTraffic,
       lowerBound: totalTraffic * (1 - currentErrorMargin),
-      upperBound: totalTraffic * (1 + currentErrorMargin)
+      upperBound: totalTraffic * (1 + currentErrorMargin),
+      actualMonth: getActualMonth(startMonth, month)
     };
   });
 }

@@ -18,4 +18,16 @@ export interface TrafficData {
   expectedTraffic: number;
   lowerBound: number;
   upperBound: number;
+  actualMonth: string;
+}
+
+export interface SeasonalityFactors {
+  [key: string]: number;
+}
+
+export interface AppState {
+  keywords: Keyword[];
+  portfolios: Portfolio[];
+  seasonality: SeasonalityFactors;
+  startMonth: number;
 }

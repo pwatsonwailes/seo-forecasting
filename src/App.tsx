@@ -3,14 +3,20 @@ import TabNavigation from './components/TabNavigation';
 import KeywordInput from './components/keyword/KeywordInput';
 import PortfolioInput from './components/PortfolioInput';
 import TrafficChart from './components/TrafficChart';
+import { TrafficTable } from './components/chart/TrafficTable';
 import PositionChart from './components/PositionChart';
 import StateManagement from './components/StateManagement';
+import { SeasonalityControls } from './components/seasonality/SeasonalityControls';
 import { Keyword, Portfolio, TrafficData } from './types';
 import { calculateMonthlyTraffic } from './utils/trafficCalculator';
+import { DEFAULT_SEASONALITY } from './utils/seasonality';
 import { BarChart } from 'lucide-react';
 
 function App() {
   const [activeTab, setActiveTab] = useState('keywords');
+  const [seasonality, setSeasonality] = useState(DEFAULT_SEASONALITY);
+  const [startMonth, setStartMonth] = useState(0);
+
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [trafficData, setTrafficData] = useState<TrafficData[]>([]);
@@ -44,7 +50,7 @@ function App() {
     if (tagsChanged) {
       setKeywords(taggedKeywords);
     }
-  }, [portfolios]); // Only depend on portfolios
+  }, [portfolios, keywords]); // Include keywords in dependency array
 
   // Handle raw keyword updates separately
   const handleKeywordsChange = (newKeywords: Keyword[]) => {
@@ -69,14 +75,18 @@ function App() {
       keywords, 
       portfolios, 
       errorMargin,
-      selectedPortfolios
+      selectedPortfolios,
+      seasonality,
+      startMonth
     );
     setTrafficData(newTrafficData);
-  }, [keywords, portfolios, errorMargin, selectedPortfolios]);
+  }, [keywords, portfolios, errorMargin, selectedPortfolios, seasonality, startMonth]);
 
-  const handleStateImport = (newKeywords: Keyword[], newPortfolios: Portfolio[]) => {
-    setPortfolios(newPortfolios);
-    handleKeywordsChange(newKeywords);
+  const handleSeasonalityChange = (month: string, value: number) => {
+    setSeasonality({
+      ...seasonality,
+      [month]: value
+    });
   };
 
   return (
@@ -93,7 +103,14 @@ function App() {
             <StateManagement
               keywords={keywords}
               portfolios={portfolios}
-              onStateImport={handleStateImport}
+              seasonality={seasonality}
+              startMonth={startMonth}
+              onStateImport={(newKeywords, newPortfolios, newSeasonality, newStartMonth) => {
+                setPortfolios(newPortfolios);
+                handleKeywordsChange(newKeywords);
+                setSeasonality(newSeasonality);
+                setStartMonth(newStartMonth);
+              }}
             />
           </div>
           <TabNavigation 
@@ -123,9 +140,9 @@ function App() {
           </div>
         )}
 
-        {activeTab === 'analysis' && (
+        {activeTab === 'analysis' && trafficData.length > 0 && (
           <div className="space-y-6">
-            {trafficData.length > 0 ? (
+            <div>
               <TrafficChart
                 data={trafficData}
                 errorMargin={errorMargin}
@@ -133,16 +150,25 @@ function App() {
                 portfolios={portfolios}
                 onPortfolioFilterChange={setSelectedPortfolios}
               />
-            ) : (
-              <div className="bg-white rounded-lg shadow-sm p-6 text-center text-gray-500">
-                Add keywords and portfolios to see the traffic forecast analysis.
-              </div>
-            )}
+              <TrafficTable data={trafficData} />
+            </div>
           </div>
         )}
 
         {activeTab === 'positions' && (
           <PositionChart portfolios={portfolios} />
+        )}
+
+        {activeTab === 'advanced' && (
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-semibold mb-4">Advanced Settings</h2>
+            <SeasonalityControls
+              seasonality={seasonality}
+              onSeasonalityChange={handleSeasonalityChange}
+              startMonth={startMonth}
+              onStartMonthChange={setStartMonth}
+            />
+          </div>
         )}
       </main>
     </div>

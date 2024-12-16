@@ -268,6 +268,7 @@ export default function TrafficChart({
             months={data.map((_, i) => i)}
             chartHeight={chartHeight}
             getX={getX}
+            actualMonths={data.map(d => d.actualMonth)}
           />
           <Tooltip {...tooltip} />
         </g>
