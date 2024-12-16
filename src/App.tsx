@@ -3,6 +3,7 @@ import TabNavigation from './components/TabNavigation';
 import KeywordInput from './components/KeywordInput';
 import PortfolioInput from './components/PortfolioInput';
 import TrafficChart from './components/TrafficChart';
+import PositionChart from './components/PositionChart';
 import StateManagement from './components/StateManagement';
 import { Keyword, Portfolio, TrafficData } from './types';
 import { calculateMonthlyTraffic } from './utils/trafficCalculator';
@@ -14,9 +15,9 @@ function App() {
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [trafficData, setTrafficData] = useState<TrafficData[]>([]);
   const [errorMargin, setErrorMargin] = useState(0.2);
+  const [selectedPortfolios, setSelectedPortfolios] = useState<string[]>([]);
 
   useEffect(() => {
-    // Tag keywords with matching portfolio terms
     const taggedKeywords = keywords.map(keyword => ({
       ...keyword,
       portfolioTags: portfolios
@@ -28,10 +29,14 @@ function App() {
         .map(portfolio => portfolio.heading)
     }));
 
-    // Calculate traffic forecast
-    const newTrafficData = calculateMonthlyTraffic(taggedKeywords, portfolios, errorMargin);
+    const newTrafficData = calculateMonthlyTraffic(
+      taggedKeywords, 
+      portfolios, 
+      errorMargin,
+      selectedPortfolios
+    );
     setTrafficData(newTrafficData);
-  }, [keywords, portfolios, errorMargin]);
+  }, [keywords, portfolios, errorMargin, selectedPortfolios]);
 
   const handleStateImport = (newKeywords: Keyword[], newPortfolios: Portfolio[]) => {
     setKeywords(newKeywords);
@@ -88,6 +93,8 @@ function App() {
                 data={trafficData}
                 errorMargin={errorMargin}
                 onErrorMarginChange={setErrorMargin}
+                portfolios={portfolios}
+                onPortfolioFilterChange={setSelectedPortfolios}
               />
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-6 text-center text-gray-500">
@@ -95,6 +102,10 @@ function App() {
               </div>
             )}
           </div>
+        )}
+
+        {activeTab === 'positions' && (
+          <PositionChart portfolios={portfolios} />
         )}
       </main>
     </div>

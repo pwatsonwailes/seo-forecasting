@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart2, FileText, Settings } from 'lucide-react';
+import { BarChart2, FileText, Settings, TrendingUp } from 'lucide-react';
 
 interface TabNavigationProps {
   activeTab: string;
@@ -11,6 +11,7 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
     { id: 'keywords', label: 'Keywords', icon: FileText },
     { id: 'portfolios', label: 'Portfolios', icon: Settings },
     { id: 'analysis', label: 'Analysis', icon: BarChart2 },
+    { id: 'positions', label: 'Positions', icon: TrendingUp },
   ];
 
   return (

@@ -26,12 +26,19 @@ export function interpolatePosition(startPos: number, endPos: number, month: num
 export function calculateMonthlyTraffic(
   keywords: Keyword[],
   portfolios: Portfolio[],
-  errorMargin: number = 0.2
+  errorMargin: number = 0.2,
+  selectedPortfolios: string[] = []
 ): TrafficData[] {
+  const startErrorMargin = 0.05;
+
   return Array.from({ length: 13 }, (_, month) => {
     let totalTraffic = 0;
 
-    keywords.forEach(keyword => {
+    const filteredKeywords = selectedPortfolios.length > 0
+      ? keywords.filter(k => k.portfolioTags.some(tag => selectedPortfolios.includes(tag)))
+      : keywords;
+
+    filteredKeywords.forEach(keyword => {
       const startPos = keyword.startPosition ?? 
         Math.min(...keyword.portfolioTags.map(tag => 
           portfolios.find(p => p.heading === tag)?.startPosition ?? 30));
@@ -45,11 +52,14 @@ export function calculateMonthlyTraffic(
       totalTraffic += keyword.searchVolume * trafficShare;
     });
 
+    const currentErrorMargin = startErrorMargin + 
+      ((errorMargin - startErrorMargin) * (month / 12));
+
     return {
       month,
       expectedTraffic: totalTraffic,
-      lowerBound: totalTraffic * (1 - errorMargin),
-      upperBound: totalTraffic * (1 + errorMargin)
+      lowerBound: totalTraffic * (1 - currentErrorMargin),
+      upperBound: totalTraffic * (1 + currentErrorMargin)
     };
   });
 }
