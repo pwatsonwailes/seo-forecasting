@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Portfolio, Keyword } from '../types';
 import { Plus, Trash2 } from 'lucide-react';
 import { PortfolioStats } from './portfolio/PortfolioStats';
+import { PortfolioKeywordMatches } from './portfolio/PortfolioKeywordMatches';
+import { PortfolioSuggestions } from './portfolio/PortfolioSuggestions';
 
 interface PortfolioInputProps {
   portfolios: Portfolio[];
@@ -45,6 +47,19 @@ export default function PortfolioInput({
         return {
           ...portfolio,
           [type === 'start' ? 'startPosition' : 'endPosition']: position
+        };
+      }
+      return portfolio;
+    });
+    onPortfoliosChange(updatedPortfolios);
+  };
+
+  const handleAddTerm = (index: number, term: string) => {
+    const updatedPortfolios = portfolios.map((portfolio, i) => {
+      if (i === index) {
+        return {
+          ...portfolio,
+          terms: [...new Set([...portfolio.terms, term])]
         };
       }
       return portfolio;
@@ -120,6 +135,12 @@ export default function PortfolioInput({
               </div>
             </div>
             <PortfolioStats portfolio={portfolio} keywords={keywords} />
+            <PortfolioKeywordMatches portfolio={portfolio} keywords={keywords} />
+            <PortfolioSuggestions 
+              portfolio={portfolio} 
+              keywords={keywords}
+              onAddTerm={(term) => handleAddTerm(index, term)}
+            />
           </div>
         ))}
       </div>
