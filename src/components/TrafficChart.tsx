@@ -4,7 +4,7 @@ import { ChartAxis } from './chart/ChartAxis';
 import { MonthLabels } from './chart/MonthLabels';
 import { TrafficPath } from './chart/TrafficPath';
 import { Tooltip } from './chart/Tooltip';
-import { Check } from 'lucide-react';
+import { Check, CheckSquare, Square } from 'lucide-react';
 
 interface TrafficChartProps {
   data: TrafficData[];
@@ -90,6 +90,17 @@ export default function TrafficChart({
     onPortfolioFilterChange(newSelection);
   };
 
+  const handleToggleAll = () => {
+    const newSelection = selectedPortfolios.length === portfolios.length
+      ? []
+      : portfolios.map(p => p.heading);
+    
+    setSelectedPortfolios(newSelection);
+    onPortfolioFilterChange(newSelection);
+  };
+
+  const allSelected = portfolios.length > 0 && selectedPortfolios.length === portfolios.length;
+
   if (data.length === 0) {
     return (
       <div className="p-6 bg-white rounded-lg shadow-md text-center text-gray-500">
@@ -121,7 +132,14 @@ export default function TrafficChart({
         </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 flex flex-wrap gap-2 items-center">
+        <button
+          onClick={handleToggleAll}
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium transition-colors bg-gray-100 text-gray-600 hover:bg-gray-200"
+        >
+          {allSelected ? <CheckSquare size={16} /> : <Square size={16} />}
+          Select All
+        </button>
         {portfolios.map((portfolio) => (
           <button
             key={portfolio.heading}

@@ -26,7 +26,7 @@ export function PortfolioStats({ portfolio, keywords }: PortfolioStatsProps) {
   );
 
   return (
-    <div className="grid grid-cols-4 gap-4 mt-2 p-3 bg-gray-50 rounded-md">
+    <div className="grid grid-cols-4 gap-4 mt-2 p-3 mb-4 bg-gray-50 rounded-md">
       <div>
         <div className="text-sm font-medium text-gray-500">Matched Keywords</div>
         <div className="text-lg font-semibold text-gray-900">
