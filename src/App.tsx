@@ -17,7 +17,7 @@ function App() {
   const [errorMargin, setErrorMargin] = useState(0.2);
   const [selectedPortfolios, setSelectedPortfolios] = useState<string[]>([]);
 
-  // Update keyword tags whenever keywords or portfolios change
+  // Update keyword tags whenever portfolios change
   useEffect(() => {
     const taggedKeywords = keywords.map(keyword => {
       const matchingPortfolios = portfolios
@@ -34,8 +34,34 @@ function App() {
       };
     });
 
+    // Only update if the tags have actually changed
+    const tagsChanged = taggedKeywords.some((newKeyword, index) => {
+      const oldKeyword = keywords[index];
+      return !oldKeyword || 
+        JSON.stringify(newKeyword.portfolioTags) !== JSON.stringify(oldKeyword.portfolioTags);
+    });
+
+    if (tagsChanged) {
+      setKeywords(taggedKeywords);
+    }
+  }, [portfolios]); // Only depend on portfolios
+
+  // Handle raw keyword updates separately
+  const handleKeywordsChange = (newKeywords: Keyword[]) => {
+    // Tag the new keywords before setting them
+    const taggedKeywords = newKeywords.map(keyword => ({
+      ...keyword,
+      portfolioTags: portfolios
+        .filter(portfolio => 
+          portfolio.terms.some(term => 
+            keyword.term.toLowerCase().includes(term.toLowerCase())
+          )
+        )
+        .map(portfolio => portfolio.heading)
+    }));
+    
     setKeywords(taggedKeywords);
-  }, [portfolios]); // Only run when portfolios change
+  };
 
   // Calculate traffic data
   useEffect(() => {
@@ -49,8 +75,8 @@ function App() {
   }, [keywords, portfolios, errorMargin, selectedPortfolios]);
 
   const handleStateImport = (newKeywords: Keyword[], newPortfolios: Portfolio[]) => {
-    setKeywords(newKeywords);
     setPortfolios(newPortfolios);
+    handleKeywordsChange(newKeywords);
   };
 
   return (
@@ -82,7 +108,7 @@ function App() {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <KeywordInput 
               keywords={keywords}
-              onKeywordsChange={setKeywords}
+              onKeywordsChange={handleKeywordsChange}
             />
           </div>
         )}

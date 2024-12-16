@@ -12,11 +12,29 @@ const POSITION_TRAFFIC_SHARE: { [key: number]: number } = {
 };
 
 export function calculateTrafficShare(position: number): number {
-  if (position <= 10) return POSITION_TRAFFIC_SHARE[position] || 0;
-  if (position <= 15) return 0.013;
-  if (position <= 20) return 0.01;
-  if (position <= 30) return 0.002;
-  return 0;
+  // Handle exact positions first
+  if (Number.isInteger(position) && position <= 10) {
+    return POSITION_TRAFFIC_SHARE[position] || 0;
+  }
+
+  // Handle positions after 10
+  if (position > 10) {
+    if (position <= 15) return 0.013;
+    if (position <= 20) return 0.01;
+    if (position <= 30) return 0.002;
+    return 0;
+  }
+
+  // Interpolate between positions for decimal values
+  const lowerPosition = Math.floor(position);
+  const upperPosition = Math.ceil(position);
+  const fraction = position - lowerPosition;
+
+  const lowerShare = POSITION_TRAFFIC_SHARE[lowerPosition] || 0;
+  const upperShare = POSITION_TRAFFIC_SHARE[upperPosition] || 0;
+
+  // Linear interpolation between the two closest positions
+  return lowerShare + (fraction * (upperShare - lowerShare));
 }
 
 export function interpolatePosition(startPos: number, endPos: number, month: number): number {
@@ -78,7 +96,7 @@ export function calculateMonthlyTraffic(
       const { startPosition, endPosition } = getLowestPositions(keyword, portfolios);
       
       const interpolatedPos = interpolatePosition(startPosition, endPosition, month);
-      const trafficShare = calculateTrafficShare(Math.round(interpolatedPos));
+      const trafficShare = calculateTrafficShare(interpolatedPos);
       totalTraffic += keyword.searchVolume * trafficShare;
     });
 

@@ -25,7 +25,7 @@ export function PortfolioCard({
   const [viewMode, setViewMode] = useState<ViewMode>(null);
 
   const handlePositionChange = (type: 'start' | 'end', value: string) => {
-    const position = Math.max(1, Math.min(100, parseInt(value) || 30));
+    const position = Math.max(1, Math.min(100, parseFloat(value) || 30));
     onUpdate({
       ...portfolio,
       [type === 'start' ? 'startPosition' : 'endPosition']: position
@@ -81,6 +81,7 @@ export function PortfolioCard({
             type="number"
             min="1"
             max="100"
+            step="0.1"
             value={portfolio.startPosition}
             onChange={(e) => handlePositionChange('start', e.target.value)}
             className="p-1 border rounded w-20"
@@ -92,6 +93,7 @@ export function PortfolioCard({
             type="number"
             min="1"
             max="100"
+            step="0.1"
             value={portfolio.endPosition}
             onChange={(e) => handlePositionChange('end', e.target.value)}
             className="p-1 border rounded w-20"

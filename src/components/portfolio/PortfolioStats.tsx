@@ -25,8 +25,13 @@ export function PortfolioStats({ portfolio, keywords }: PortfolioStatsProps) {
     sum + (keyword.searchVolume * calculateTrafficShare(portfolio.endPosition ?? 30)), 0
   );
 
+  // Calculate potential traffic at position 1
+  const potentialTraffic = matchingKeywords.reduce((sum, keyword) => 
+    sum + (keyword.searchVolume * calculateTrafficShare(1)), 0
+  );
+
   return (
-    <div className="grid grid-cols-4 gap-4 mt-2 p-3 mb-4 bg-gray-50 rounded-md">
+    <div className="grid grid-cols-5 gap-4 mt-2 p-3 bg-gray-50 rounded-md">
       <div>
         <div className="text-sm font-medium text-gray-500">Matched Keywords</div>
         <div className="text-lg font-semibold text-gray-900">
@@ -49,6 +54,12 @@ export function PortfolioStats({ portfolio, keywords }: PortfolioStatsProps) {
         <div className="text-sm font-medium text-gray-500">Projected Traffic</div>
         <div className="text-lg font-semibold text-gray-900">
           {formatTraffic(endTraffic)}
+        </div>
+      </div>
+      <div>
+        <div className="text-sm font-medium text-gray-500">Potential Traffic (#1)</div>
+        <div className="text-lg font-semibold text-blue-600">
+          {formatTraffic(potentialTraffic)}
         </div>
       </div>
     </div>
