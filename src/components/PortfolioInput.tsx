@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
-import { Portfolio } from '../types';
+import { Portfolio, Keyword } from '../types';
 import { Plus, Trash2 } from 'lucide-react';
+import { PortfolioStats } from './portfolio/PortfolioStats';
 
 interface PortfolioInputProps {
   portfolios: Portfolio[];
   onPortfoliosChange: (portfolios: Portfolio[]) => void;
+  keywords: Keyword[];
 }
 
-export default function PortfolioInput({ portfolios, onPortfoliosChange }: PortfolioInputProps) {
+export default function PortfolioInput({ 
+  portfolios, 
+  onPortfoliosChange,
+  keywords 
+}: PortfolioInputProps) {
   const [newHeading, setNewHeading] = useState('');
   const [newTerms, setNewTerms] = useState('');
 
@@ -74,7 +80,7 @@ export default function PortfolioInput({ portfolios, onPortfoliosChange }: Portf
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {portfolios.map((portfolio, index) => (
           <div key={index} className="p-4 border rounded">
             <div className="flex items-center justify-between mb-2">
@@ -89,7 +95,7 @@ export default function PortfolioInput({ portfolios, onPortfoliosChange }: Portf
             <div className="text-sm text-gray-600 mb-2">
               Terms: {portfolio.terms.join(', ')}
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-4 mb-4">
               <div>
                 <label className="block text-sm text-gray-600">Start Position</label>
                 <input
@@ -113,6 +119,7 @@ export default function PortfolioInput({ portfolios, onPortfoliosChange }: Portf
                 />
               </div>
             </div>
+            <PortfolioStats portfolio={portfolio} keywords={keywords} />
           </div>
         ))}
       </div>
