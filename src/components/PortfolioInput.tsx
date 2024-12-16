@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Portfolio, Keyword } from '../types';
 import { Plus, Trash2 } from 'lucide-react';
 import { PortfolioStats } from './portfolio/PortfolioStats';

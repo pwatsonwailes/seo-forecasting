@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import TabNavigation from './components/TabNavigation';
 import KeywordInput from './components/KeywordInput';
 import PortfolioInput from './components/PortfolioInput';
