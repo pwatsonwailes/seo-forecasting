@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
-import { Keyword } from '../types';
-import { SingleKeywordInput } from './keyword/SingleKeywordInput';
-import { BulkKeywordInput } from './keyword/BulkKeywordInput';
-import { KeywordTable } from './keyword/KeywordTable';
+import { Keyword } from '../../types';
+import { SingleKeywordInput } from './SingleKeywordInput';
+import { BulkKeywordInput } from './BulkKeywordInput';
+import { KeywordTable } from './KeywordTable';
+import { KeywordStats } from './KeywordStats';
 
 interface KeywordInputProps {
   keywords: Keyword[];
@@ -74,6 +75,9 @@ export default function KeywordInput({ keywords, onKeywordsChange }: KeywordInpu
           </button>
         )}
       </div>
+
+      {/* KeywordStats component is placed here, before the input sections */}
+      {keywords.length > 0 && <KeywordStats keywords={keywords} />}
 
       <div className="grid grid-cols-2 gap-4">
         <SingleKeywordInput

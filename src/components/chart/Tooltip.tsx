@@ -12,13 +12,32 @@ interface TooltipProps {
 export function Tooltip({ x, y, month, traffic, visible }: TooltipProps) {
   if (!visible) return null;
 
+  // Constants for tooltip dimensions and chart boundaries
+  const tooltipWidth = 100;
+  const tooltipHeight = 35;
+  const tooltipPadding = 8;
+  const chartRightBoundary = 800 - 20; // chartWidth - margin.right
+
+  // Calculate tooltip position to keep it within bounds
+  let tooltipX = x;
+  const tooltipHalfWidth = tooltipWidth / 2;
+
+  // Adjust x position if tooltip would extend beyond right edge
+  if (x + tooltipHalfWidth > chartRightBoundary) {
+    tooltipX = chartRightBoundary - tooltipHalfWidth - tooltipPadding;
+  }
+  // Adjust x position if tooltip would extend beyond left edge
+  else if (x - tooltipHalfWidth < 60) { // margin.left
+    tooltipX = 60 + tooltipHalfWidth + tooltipPadding;
+  }
+
   return (
-    <g transform={`translate(${x}, ${y})`}>
+    <g transform={`translate(${tooltipX}, ${y})`}>
       <rect
-        x="-50"
-        y="-40"
-        width="100"
-        height="35"
+        x={-tooltipWidth / 2}
+        y={-tooltipHeight - 5}
+        width={tooltipWidth}
+        height={tooltipHeight}
         rx="4"
         fill="white"
         stroke="#E5E7EB"
@@ -26,7 +45,7 @@ export function Tooltip({ x, y, month, traffic, visible }: TooltipProps) {
       />
       <text
         x="0"
-        y="-22"
+        y={-tooltipHeight + 13}
         textAnchor="middle"
         className="text-xs fill-gray-700 font-medium"
       >
@@ -34,7 +53,7 @@ export function Tooltip({ x, y, month, traffic, visible }: TooltipProps) {
       </text>
       <text
         x="0"
-        y="-8"
+        y={-tooltipHeight + 27}
         textAnchor="middle"
         className="text-xs fill-gray-600"
       >

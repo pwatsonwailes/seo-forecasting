@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from '../modal/Modal';
 import { TermPreview } from './TermPreview';
 import { Portfolio, Keyword } from '../../types';
-import { Plus, X } from 'lucide-react';
+import { Plus, Search, X } from 'lucide-react';
 
 interface EditPortfolioModalProps {
   isOpen: boolean;
@@ -23,17 +23,16 @@ export function EditPortfolioModal({
   const [newTerm, setNewTerm] = useState('');
   const [showPreview, setShowPreview] = useState(false);
 
-  const handleAddTerm = (skipPreview = false) => {
+  const handleAddTerm = () => {
     if (!newTerm.trim()) return;
-
-    if (!skipPreview && !showPreview) {
-      setShowPreview(true);
-      return;
-    }
-
     setTerms([...terms, newTerm.trim()]);
     setNewTerm('');
     setShowPreview(false);
+  };
+
+  const handleShowMatches = () => {
+    if (!newTerm.trim()) return;
+    setShowPreview(true);
   };
 
   const handleRemoveTerm = (index: number) => {
@@ -90,17 +89,18 @@ export function EditPortfolioModal({
               placeholder="Enter a term"
             />
             <button
-              onClick={() => handleAddTerm(true)}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+              onClick={handleShowMatches}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
             >
-              Add Without Preview
+              <Search size={20} />
+              Show Matches
             </button>
             <button
-              onClick={() => handleAddTerm(false)}
+              onClick={handleAddTerm}
               className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
               <Plus size={20} />
-              {showPreview ? 'Confirm Add' : 'Preview & Add'}
+              Add
             </button>
           </div>
         </div>

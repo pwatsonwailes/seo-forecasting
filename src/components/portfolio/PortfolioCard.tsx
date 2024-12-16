@@ -13,6 +13,8 @@ interface PortfolioCardProps {
   onUpdate: (portfolio: Portfolio) => void;
 }
 
+type ViewMode = 'matches' | 'suggestions' | null;
+
 export function PortfolioCard({
   portfolio,
   keywords,
@@ -20,6 +22,7 @@ export function PortfolioCard({
   onUpdate
 }: PortfolioCardProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>(null);
 
   const handlePositionChange = (type: 'start' | 'end', value: string) => {
     const position = Math.max(1, Math.min(100, parseInt(value) || 30));
@@ -34,6 +37,10 @@ export function PortfolioCard({
       ...portfolio,
       terms: newTerms
     });
+  };
+
+  const toggleView = (mode: ViewMode) => {
+    setViewMode(viewMode === mode ? null : mode);
   };
 
   return (
@@ -67,11 +74,9 @@ export function PortfolioCard({
         ))}
       </div>
 
-      <PortfolioStats portfolio={portfolio} keywords={keywords} />
-
-      <div className="flex gap-4 mb-4">
-        <div>
-          <label className="block text-sm text-gray-600">Start Position</label>
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-gray-600 w-24">Start Position:</label>
           <input
             type="number"
             min="1"
@@ -81,8 +86,8 @@ export function PortfolioCard({
             className="p-1 border rounded w-20"
           />
         </div>
-        <div>
-          <label className="block text-sm text-gray-600">End Position</label>
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-gray-600 w-24">End Position:</label>
           <input
             type="number"
             min="1"
@@ -94,12 +99,49 @@ export function PortfolioCard({
         </div>
       </div>
 
-      <PortfolioKeywordMatches portfolio={portfolio} keywords={keywords} />
-      <PortfolioSuggestions
-        portfolio={portfolio}
-        keywords={keywords}
-        onAddTerm={(term) => handleTermsChange([...portfolio.terms, term])}
-      />
+      <PortfolioStats portfolio={portfolio} keywords={keywords} />
+
+      <div className="flex justify-between mt-4 mb-2">
+        <button
+          onClick={() => toggleView('matches')}
+          className={`px-4 py-2 rounded-lg transition-colors ${
+            viewMode === 'matches'
+              ? 'bg-blue-100 text-blue-800' 
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          View Matched Keywords
+        </button>
+        <button
+          onClick={() => toggleView('suggestions')}
+          className={`px-4 py-2 rounded-lg transition-colors ${
+            viewMode === 'suggestions'
+              ? 'bg-blue-100 text-blue-800' 
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          View Common Terms
+        </button>
+      </div>
+
+      {viewMode === 'matches' && (
+        <div className="mt-4">
+          <PortfolioKeywordMatches 
+            portfolio={portfolio} 
+            keywords={keywords} 
+          />
+        </div>
+      )}
+
+      {viewMode === 'suggestions' && (
+        <div className="mt-4">
+          <PortfolioSuggestions
+            portfolio={portfolio}
+            keywords={keywords}
+            onAddTerm={(term) => handleTermsChange([...portfolio.terms, term])}
+          />
+        </div>
+      )}
 
       <EditPortfolioModal
         isOpen={isEditing}

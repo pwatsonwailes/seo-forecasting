@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import TabNavigation from './components/TabNavigation';
-import KeywordInput from './components/KeywordInput';
+import KeywordInput from './components/keyword/KeywordInput';
 import PortfolioInput from './components/PortfolioInput';
 import TrafficChart from './components/TrafficChart';
 import PositionChart from './components/PositionChart';
