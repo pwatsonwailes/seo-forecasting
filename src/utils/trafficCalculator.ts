@@ -23,6 +23,41 @@ export function interpolatePosition(startPos: number, endPos: number, month: num
   return startPos + ((endPos - startPos) * (month / 12));
 }
 
+function getLowestPositions(
+  keyword: Keyword,
+  portfolios: Portfolio[]
+): { startPosition: number; endPosition: number } {
+  // If keyword has custom positions, use those
+  if (keyword.startPosition !== undefined && keyword.endPosition !== undefined) {
+    return {
+      startPosition: keyword.startPosition,
+      endPosition: keyword.endPosition
+    };
+  }
+
+  // Get all matching portfolio positions
+  const matchingPositions = keyword.portfolioTags
+    .map(tag => {
+      const portfolio = portfolios.find(p => p.heading === tag);
+      return portfolio ? {
+        startPosition: portfolio.startPosition ?? 30,
+        endPosition: portfolio.endPosition ?? 30
+      } : null;
+    })
+    .filter((pos): pos is NonNullable<typeof pos> => pos !== null);
+
+  // If no matching portfolios, use default position 30
+  if (matchingPositions.length === 0) {
+    return { startPosition: 30, endPosition: 30 };
+  }
+
+  // Return the lowest positions
+  return {
+    startPosition: Math.min(...matchingPositions.map(p => p.startPosition)),
+    endPosition: Math.min(...matchingPositions.map(p => p.endPosition))
+  };
+}
+
 export function calculateMonthlyTraffic(
   keywords: Keyword[],
   portfolios: Portfolio[],
@@ -39,15 +74,10 @@ export function calculateMonthlyTraffic(
       : keywords;
 
     filteredKeywords.forEach(keyword => {
-      const startPos = keyword.startPosition ?? 
-        Math.min(...keyword.portfolioTags.map(tag => 
-          portfolios.find(p => p.heading === tag)?.startPosition ?? 30));
+      // Get lowest positions from all matching portfolios
+      const { startPosition, endPosition } = getLowestPositions(keyword, portfolios);
       
-      const endPos = keyword.endPosition ?? 
-        Math.min(...keyword.portfolioTags.map(tag => 
-          portfolios.find(p => p.heading === tag)?.endPosition ?? 30));
-
-      const interpolatedPos = interpolatePosition(startPos, endPos, month);
+      const interpolatedPos = interpolatePosition(startPosition, endPosition, month);
       const trafficShare = calculateTrafficShare(Math.round(interpolatedPos));
       totalTraffic += keyword.searchVolume * trafficShare;
     });

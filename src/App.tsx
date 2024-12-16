@@ -17,20 +17,30 @@ function App() {
   const [errorMargin, setErrorMargin] = useState(0.2);
   const [selectedPortfolios, setSelectedPortfolios] = useState<string[]>([]);
 
+  // Update keyword tags whenever keywords or portfolios change
   useEffect(() => {
-    const taggedKeywords = keywords.map(keyword => ({
-      ...keyword,
-      portfolioTags: portfolios
+    const taggedKeywords = keywords.map(keyword => {
+      const matchingPortfolios = portfolios
         .filter(portfolio => 
           portfolio.terms.some(term => 
             keyword.term.toLowerCase().includes(term.toLowerCase())
           )
         )
-        .map(portfolio => portfolio.heading)
-    }));
+        .map(portfolio => portfolio.heading);
 
+      return {
+        ...keyword,
+        portfolioTags: matchingPortfolios
+      };
+    });
+
+    setKeywords(taggedKeywords);
+  }, [portfolios]); // Only run when portfolios change
+
+  // Calculate traffic data
+  useEffect(() => {
     const newTrafficData = calculateMonthlyTraffic(
-      taggedKeywords, 
+      keywords, 
       portfolios, 
       errorMargin,
       selectedPortfolios
@@ -82,6 +92,7 @@ function App() {
             <PortfolioInput
               portfolios={portfolios}
               onPortfoliosChange={setPortfolios}
+              keywords={keywords}
             />
           </div>
         )}
