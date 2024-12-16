@@ -1,127 +1,101 @@
 import React, { useState } from 'react';
-import { Portfolio, Keyword } from '../types';
-import { Plus, Trash2 } from 'lucide-react';
-import { PortfolioStats } from './portfolio/PortfolioStats';
+import { Trash2 } from 'lucide-react';
+import { Keyword } from '../types';
+import { SingleKeywordInput } from './keyword/SingleKeywordInput';
+import { BulkKeywordInput } from './keyword/BulkKeywordInput';
+import { KeywordTable } from './keyword/KeywordTable';
 
-interface PortfolioInputProps {
-  portfolios: Portfolio[];
-  onPortfoliosChange: (portfolios: Portfolio[]) => void;
+interface KeywordInputProps {
   keywords: Keyword[];
+  onKeywordsChange: (keywords: Keyword[]) => void;
 }
 
-export default function PortfolioInput({ 
-  portfolios, 
-  onPortfoliosChange,
-  keywords 
-}: PortfolioInputProps) {
-  const [newHeading, setNewHeading] = useState('');
-  const [newTerms, setNewTerms] = useState('');
+export default function KeywordInput({ keywords, onKeywordsChange }: KeywordInputProps) {
+  const [keywordInput, setKeywordInput] = useState('');
+  const [volumeInput, setVolumeInput] = useState('');
+  const [bulkInput, setBulkInput] = useState('');
 
-  const handleAddPortfolio = () => {
-    if (!newHeading || !newTerms) return;
+  const handleAddKeyword = () => {
+    if (!keywordInput || !volumeInput) return;
     
-    onPortfoliosChange([
-      ...portfolios,
+    const volume = parseInt(volumeInput);
+    if (isNaN(volume)) return;
+
+    onKeywordsChange([
+      ...keywords,
       {
-        heading: newHeading,
-        terms: newTerms.split(',').map(term => term.trim()),
-        startPosition: 30,
-        endPosition: 30
+        term: keywordInput.trim(),
+        searchVolume: volume,
+        portfolioTags: []
       }
     ]);
-    
-    setNewHeading('');
-    setNewTerms('');
+
+    setKeywordInput('');
+    setVolumeInput('');
   };
 
-  const handleRemovePortfolio = (index: number) => {
-    onPortfoliosChange(portfolios.filter((_, i) => i !== index));
-  };
+  const handleBulkImport = () => {
+    if (!bulkInput.trim()) return;
 
-  const handlePositionChange = (index: number, type: 'start' | 'end', value: string) => {
-    const position = Math.max(1, Math.min(100, parseInt(value) || 30));
-    const updatedPortfolios = portfolios.map((portfolio, i) => {
-      if (i === index) {
+    const lines = bulkInput.split('\n');
+    const newKeywords: Keyword[] = lines
+      .filter(line => line.trim())
+      .map(line => {
+        const [term, volume] = line.split(',');
         return {
-          ...portfolio,
-          [type === 'start' ? 'startPosition' : 'endPosition']: position
+          term: term.trim(),
+          searchVolume: parseInt(volume?.trim() || '0', 10),
+          portfolioTags: []
         };
-      }
-      return portfolio;
-    });
-    onPortfoliosChange(updatedPortfolios);
+      })
+      .filter(k => !isNaN(k.searchVolume));
+    
+    onKeywordsChange([...keywords, ...newKeywords]);
+    setBulkInput('');
+  };
+
+  const handleClearKeywords = () => {
+    if (keywords.length > 0 && confirm('Are you sure you want to clear all keywords?')) {
+      onKeywordsChange([]);
+    }
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Portfolio Management</h2>
-      
-      <div className="flex gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Portfolio Heading"
-          className="flex-1 p-2 border rounded"
-          value={newHeading}
-          onChange={(e) => setNewHeading(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Terms (comma-separated)"
-          className="flex-1 p-2 border rounded"
-          value={newTerms}
-          onChange={(e) => setNewTerms(e.target.value)}
-        />
-        <button
-          onClick={handleAddPortfolio}
-          className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-        >
-          <Plus size={20} />
-          Add
-        </button>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Keywords</h2>
+        {keywords.length > 0 && (
+          <button
+            onClick={handleClearKeywords}
+            className="flex items-center gap-2 px-4 py-2 text-red-500 hover:text-red-600 transition-colors"
+          >
+            <Trash2 size={20} />
+            Clear All
+          </button>
+        )}
       </div>
 
-      <div className="space-y-6">
-        {portfolios.map((portfolio, index) => (
-          <div key={index} className="p-4 border rounded">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold">{portfolio.heading}</h3>
-              <button
-                onClick={() => handleRemovePortfolio(index)}
-                className="text-red-500 hover:text-red-600"
-              >
-                <Trash2 size={20} />
-              </button>
-            </div>
-            <div className="text-sm text-gray-600 mb-2">
-              Terms: {portfolio.terms.join(', ')}
-            </div>
-            <div className="flex gap-4 mb-4">
-              <div>
-                <label className="block text-sm text-gray-600">Start Position</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="100"
-                  value={portfolio.startPosition}
-                  onChange={(e) => handlePositionChange(index, 'start', e.target.value)}
-                  className="p-1 border rounded w-20"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600">End Position</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="100"
-                  value={portfolio.endPosition}
-                  onChange={(e) => handlePositionChange(index, 'end', e.target.value)}
-                  className="p-1 border rounded w-20"
-                />
-              </div>
-            </div>
-            <PortfolioStats portfolio={portfolio} keywords={keywords} />
-          </div>
-        ))}
+      <div className="grid grid-cols-2 gap-4">
+        <SingleKeywordInput
+          keywordInput={keywordInput}
+          volumeInput={volumeInput}
+          onKeywordChange={setKeywordInput}
+          onVolumeChange={setVolumeInput}
+          onAdd={handleAddKeyword}
+        />
+
+        <BulkKeywordInput
+          bulkInput={bulkInput}
+          onBulkInputChange={setBulkInput}
+          onImport={handleBulkImport}
+        />
+      </div>
+
+      <div className="border rounded-lg overflow-hidden">
+        <KeywordTable
+          keywords={keywords}
+          onRemove={(index) => onKeywordsChange(keywords.filter((_, i) => i !== index))}
+        />
       </div>
     </div>
   );
