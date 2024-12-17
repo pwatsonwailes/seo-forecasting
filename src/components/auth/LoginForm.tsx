@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { Link } from 'react-router-dom';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -57,6 +58,13 @@ export function LoginForm() {
             Sign In
           </button>
         </form>
+        
+        <div className="mt-6 text-center text-sm text-gray-600">
+          Don't have an account?{' '}
+          <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
+            Sign up here
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TabNavigation from './TabNavigation';
 import KeywordInput from './keyword/KeywordInput';
 import PortfolioInput from './PortfolioInput';
-import TrafficChart from '/TrafficChart';
+import TrafficChart from './TrafficChart';
 import { TrafficStats } from './chart/TrafficStats';
 import { TrafficTable } from './chart/TrafficTable';
 import PositionChart from './PositionChart';
@@ -94,26 +94,6 @@ function Dashboard() {
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <BarChart size={32} className="text-blue-500" />
-              <h1 className="text-2xl font-bold text-gray-800">
-                SEO Traffic Forecasting
-              </h1>
-            </div>
-            <StateManagement
-              keywords={keywords}
-              portfolios={portfolios}
-              seasonality={seasonality}
-              startMonth={startMonth}
-              onStateImport={(newKeywords, newPortfolios, newSeasonality, newStartMonth) => {
-                setPortfolios(newPortfolios);
-                handleKeywordsChange(newKeywords);
-                setSeasonality(newSeasonality);
-                setStartMonth(newStartMonth);
-              }}
-            />
-          </div>
           <TabNavigation 
             activeTab={activeTab}
             onTabChange={setActiveTab}
