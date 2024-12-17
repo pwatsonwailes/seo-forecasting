@@ -61,6 +61,12 @@ export default function KeywordInput({ keywords, onKeywordsChange }: KeywordInpu
     }
   };
 
+  const handleUpdateKeyword = (index: number, updatedKeyword: Keyword) => {
+    const newKeywords = [...keywords];
+    newKeywords[index] = updatedKeyword;
+    onKeywordsChange(newKeywords);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -76,7 +82,6 @@ export default function KeywordInput({ keywords, onKeywordsChange }: KeywordInpu
         )}
       </div>
 
-      {/* KeywordStats component is placed here, before the input sections */}
       {keywords.length > 0 && <KeywordStats keywords={keywords} />}
 
       <div className="grid grid-cols-2 gap-4">
@@ -99,6 +104,7 @@ export default function KeywordInput({ keywords, onKeywordsChange }: KeywordInpu
         <KeywordTable
           keywords={keywords}
           onRemove={(index) => onKeywordsChange(keywords.filter((_, i) => i !== index))}
+          onUpdate={handleUpdateKeyword}
         />
       </div>
     </div>

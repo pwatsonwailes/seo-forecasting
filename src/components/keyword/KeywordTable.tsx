@@ -1,13 +1,48 @@
-import React from 'react';
-import { Trash2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import { Keyword } from '../../types';
+import { EditableKeywordRow } from './EditableKeywordRow';
+import { KeywordTableControls } from './KeywordTableControls';
 
 interface KeywordTableProps {
   keywords: Keyword[];
   onRemove: (index: number) => void;
+  onUpdate: (index: number, updatedKeyword: Keyword) => void;
 }
 
-export function KeywordTable({ keywords, onRemove }: KeywordTableProps) {
+export function KeywordTable({ keywords, onRemove, onUpdate }: KeywordTableProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [portfolioFilter, setPortfolioFilter] = useState('');
+
+  // Get unique portfolio names
+  const availablePortfolios = useMemo(() => {
+    const portfolios = new Set<string>();
+    keywords.forEach(keyword => {
+      keyword.portfolioTags.forEach(tag => portfolios.add(tag));
+    });
+    return Array.from(portfolios).sort();
+  }, [keywords]);
+
+  // Filter keywords based on search term and portfolio filter
+  const filteredKeywords = useMemo(() => {
+    return keywords.filter(keyword => {
+      // Apply search filter
+      const matchesSearch = keyword.term.toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+      // Apply portfolio filter
+      let matchesPortfolio = true;
+      if (portfolioFilter === 'unmatched') {
+        matchesPortfolio = keyword.portfolioTags.length === 0;
+      } else if (portfolioFilter === 'any') {
+        matchesPortfolio = keyword.portfolioTags.length > 0;
+      } else if (portfolioFilter) {
+        matchesPortfolio = keyword.portfolioTags.includes(portfolioFilter);
+      }
+
+      return matchesSearch && matchesPortfolio;
+    });
+  }, [keywords, searchTerm, portfolioFilter]);
+
   if (keywords.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
@@ -17,34 +52,42 @@ export function KeywordTable({ keywords, onRemove }: KeywordTableProps) {
   }
 
   return (
-    <table className="w-full">
-      <thead>
-        <tr className="bg-gray-50">
-          <th className="px-4 py-2 text-left">Keyword</th>
-          <th className="px-4 py-2 text-left">Search Volume</th>
-          <th className="px-4 py-2 text-left">Portfolio Tags</th>
-          <th className="px-4 py-2 text-right">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {keywords.map((keyword, index) => (
-          <tr key={index} className="border-t">
-            <td className="px-4 py-2">{keyword.term}</td>
-            <td className="px-4 py-2">{keyword.searchVolume.toLocaleString()}</td>
-            <td className="px-4 py-2">
-              {keyword.portfolioTags.join(', ')}
-            </td>
-            <td className="px-4 py-2 text-right">
-              <button
-                onClick={() => onRemove(index)}
-                className="text-red-500 hover:text-red-600"
-              >
-                <Trash2 size={20} />
-              </button>
-            </td>
+    <div>
+      <KeywordTableControls
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        portfolioFilter={portfolioFilter}
+        onPortfolioFilterChange={setPortfolioFilter}
+        availablePortfolios={availablePortfolios}
+      />
+
+      <table className="w-full">
+        <thead>
+          <tr className="bg-gray-50">
+            <th className="px-4 py-2 text-left">Keyword</th>
+            <th className="px-4 py-2 text-left">Search Volume</th>
+            <th className="px-4 py-2 text-left">Portfolio Tags</th>
+            <th className="px-4 py-2 text-right">Actions</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {filteredKeywords.map((keyword, index) => (
+            <EditableKeywordRow
+              key={index}
+              keyword={keyword}
+              index={keywords.indexOf(keyword)} // Use original index
+              onUpdate={onUpdate}
+              onRemove={onRemove}
+            />
+          ))}
+        </tbody>
+      </table>
+
+      {filteredKeywords.length === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          No keywords match your search criteria.
+        </div>
+      )}
+    </div>
   );
 }
