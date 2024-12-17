@@ -12,8 +12,8 @@ export function TrafficTable({ data }: TrafficTableProps) {
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-gray-50">
+            <th className="px-4 py-2 text-left font-medium text-gray-600">Index</th>
             <th className="px-4 py-2 text-left font-medium text-gray-600">Month</th>
-            <th className="px-4 py-2 text-left font-medium text-gray-600">Period</th>
             <th className="px-4 py-2 text-right font-medium text-gray-600">Expected Traffic</th>
             <th className="px-4 py-2 text-right font-medium text-gray-600">Lower Bound</th>
             <th className="px-4 py-2 text-right font-medium text-gray-600">Upper Bound</th>

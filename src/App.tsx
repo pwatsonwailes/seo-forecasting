@@ -3,6 +3,7 @@ import TabNavigation from './components/TabNavigation';
 import KeywordInput from './components/keyword/KeywordInput';
 import PortfolioInput from './components/PortfolioInput';
 import TrafficChart from './components/TrafficChart';
+import { TrafficStats } from './components/chart/TrafficStats';
 import { TrafficTable } from './components/chart/TrafficTable';
 import PositionChart from './components/PositionChart';
 import StateManagement from './components/StateManagement';
@@ -149,6 +150,12 @@ function App() {
                 onErrorMarginChange={setErrorMargin}
                 portfolios={portfolios}
                 onPortfolioFilterChange={setSelectedPortfolios}
+              />
+              <TrafficStats
+                data={trafficData}
+                keywords={keywords}
+                portfolios={portfolios}
+                selectedPortfolios={selectedPortfolios}
               />
               <TrafficTable data={trafficData} />
             </div>
