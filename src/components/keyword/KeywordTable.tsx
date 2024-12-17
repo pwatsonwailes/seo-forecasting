@@ -24,23 +24,24 @@ export function KeywordTable({ keywords, onRemove, onUpdate }: KeywordTableProps
 
   // Filter keywords based on search term and portfolio filter
   const filteredKeywords = useMemo(() => {
-    return keywords.filter(keyword => {
-      // Apply search filter
-      const matchesSearch = keyword.term.toLowerCase()
-        .includes(searchTerm.toLowerCase());
+    return keywords.map((keyword, index) => ({ keyword, originalIndex: index }))
+      .filter(({ keyword }) => {
+        // Apply search filter
+        const matchesSearch = keyword.term.toLowerCase()
+          .includes(searchTerm.toLowerCase());
 
-      // Apply portfolio filter
-      let matchesPortfolio = true;
-      if (portfolioFilter === 'unmatched') {
-        matchesPortfolio = keyword.portfolioTags.length === 0;
-      } else if (portfolioFilter === 'any') {
-        matchesPortfolio = keyword.portfolioTags.length > 0;
-      } else if (portfolioFilter) {
-        matchesPortfolio = keyword.portfolioTags.includes(portfolioFilter);
-      }
+        // Apply portfolio filter
+        let matchesPortfolio = true;
+        if (portfolioFilter === 'unmatched') {
+          matchesPortfolio = keyword.portfolioTags.length === 0;
+        } else if (portfolioFilter === 'any') {
+          matchesPortfolio = keyword.portfolioTags.length > 0;
+        } else if (portfolioFilter) {
+          matchesPortfolio = keyword.portfolioTags.includes(portfolioFilter);
+        }
 
-      return matchesSearch && matchesPortfolio;
-    });
+        return matchesSearch && matchesPortfolio;
+      });
   }, [keywords, searchTerm, portfolioFilter]);
 
   if (keywords.length === 0) {
@@ -71,11 +72,11 @@ export function KeywordTable({ keywords, onRemove, onUpdate }: KeywordTableProps
           </tr>
         </thead>
         <tbody>
-          {filteredKeywords.map((keyword, index) => (
+          {filteredKeywords.map(({ keyword, originalIndex }) => (
             <EditableKeywordRow
-              key={index}
+              key={originalIndex}
               keyword={keyword}
-              index={keywords.indexOf(keyword)} // Use original index
+              index={originalIndex}
               onUpdate={onUpdate}
               onRemove={onRemove}
             />
