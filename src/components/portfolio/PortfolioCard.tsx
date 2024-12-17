@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Portfolio, Keyword } from '../../types';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2, Copy, Check } from 'lucide-react';
 import { EditPortfolioModal } from './EditPortfolioModal';
 import { PortfolioStats } from './PortfolioStats';
 import { PortfolioKeywordMatches } from './PortfolioKeywordMatches';
@@ -23,6 +23,7 @@ export function PortfolioCard({
 }: PortfolioCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>(null);
+  const [copied, setCopied] = useState(false);
 
   const handlePositionChange = (type: 'start' | 'end', value: string) => {
     const position = Math.max(1, Math.min(100, parseFloat(value) || 30));
@@ -43,11 +44,30 @@ export function PortfolioCard({
     setViewMode(viewMode === mode ? null : mode);
   };
 
+  const handleCopyTerms = async () => {
+    try {
+      await navigator.clipboard.writeText(portfolio.terms.join('|'));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy terms:', err);
+    }
+  };
+
   return (
     <div className="p-4 border rounded">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold">{portfolio.heading}</h3>
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleCopyTerms}
+            className={`p-1 transition-colors ${
+              copied ? 'text-green-500' : 'text-gray-500 hover:text-gray-600'
+            }`}
+            title="Copy terms to clipboard"
+          >
+            {copied ? <Check size={20} /> : <Copy size={20} />}
+          </button>
           <button
             onClick={() => setIsEditing(true)}
             className="p-1 text-gray-500 hover:text-gray-600"
