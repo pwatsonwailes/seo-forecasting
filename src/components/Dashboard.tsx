@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavigationBar } from './navigation/NavigationBar';
+import { NavigationBar } from './NavigationBar';
 import KeywordInput from './keyword/KeywordInput';
 import PortfolioInput from './PortfolioInput';
 import TrafficChart from './TrafficChart';

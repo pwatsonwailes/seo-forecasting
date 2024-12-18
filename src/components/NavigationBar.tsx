@@ -1,7 +1,7 @@
 import React from 'react';
-import TabNavigation from '../TabNavigation';
-import StateManagement from '../state/StateManagement';
-import { AppState } from '../../types';
+import TabNavigation from './TabNavigation';
+import StateManagement from './state/StateManagement';
+import { AppState } from '../types';
 
 interface NavigationBarProps {
   activeTab: string;
