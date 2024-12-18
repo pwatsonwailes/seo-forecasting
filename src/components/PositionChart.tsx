@@ -36,10 +36,10 @@ export default function PositionChart({ portfolios }: PositionChartProps) {
   };
 
   const getX = (month: number): number => {
-    return margin.left + ((month / 12) * (chartWidth - margin.left - margin.right));
+    return margin.left + ((month / 11) * (chartWidth - margin.left - margin.right)); // Changed from 12 to 11
   };
 
-  const months = Array.from({ length: 13 }, (_, i) => i);
+  const months = Array.from({ length: 12 }, (_, i) => i); // Changed from 13 to 12
   const positions = Array.from({ length: 7 }, (_, i) => i * 5 + 1);
 
   const handlePortfolioToggle = (heading: string) => {

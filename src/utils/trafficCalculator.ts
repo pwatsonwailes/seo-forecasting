@@ -41,7 +41,7 @@ export function calculateTrafficShare(position: number): number {
 }
 
 export function interpolatePosition(startPos: number, endPos: number, month: number): number {
-  return startPos + ((endPos - startPos) * (month / 12));
+  return startPos + ((endPos - startPos) * (month / 11)); // Changed from 12 to 11 for proper interpolation over 12 months
 }
 
 function getLowestPositions(
@@ -89,7 +89,7 @@ export function calculateMonthlyTraffic(
 ): TrafficData[] {
   const startErrorMargin = 0.05;
 
-  return Array.from({ length: 13 }, (_, month) => {
+  return Array.from({ length: 12 }, (_, month) => { // Changed from 13 to 12
     let totalTraffic = 0;
 
     const filteredKeywords = selectedPortfolios.length > 0
@@ -109,7 +109,7 @@ export function calculateMonthlyTraffic(
 
     // Calculate error margin that grows over time
     const currentErrorMargin = startErrorMargin + 
-      ((errorMargin - startErrorMargin) * (month / 12));
+      ((errorMargin - startErrorMargin) * (month / 11)); // Changed from 12 to 11
 
     return {
       month,
