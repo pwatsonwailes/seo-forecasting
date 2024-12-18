@@ -17,7 +17,7 @@ export function NavigationBar({
   onStateImport
 }: NavigationBarProps) {
   return (
-    <div className="flex justify-between items-center border-b mb-6">
+    <div className="flex justify-between items-center">
       <TabNavigation 
         activeTab={activeTab}
         onTabChange={onTabChange}

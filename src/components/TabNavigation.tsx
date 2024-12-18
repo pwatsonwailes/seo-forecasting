@@ -18,22 +18,18 @@ export default function TabNavigation({
     { id: 'advanced', label: 'Advanced', icon: Sliders },
   ];
 
-  return (
-    <div className="flex border-b mb-6">
-      {tabs.map(({ id, label, icon: Icon }) => (
-        <button
-          key={id}
-          onClick={() => onTabChange(id)}
-          className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors
-            ${activeTab === id 
-              ? 'text-blue-600 border-b-2 border-blue-600' 
-              : 'text-gray-600 hover:text-blue-600'
-            }`}
-        >
-          <Icon size={20} />
-          {label}
-        </button>
-      ))}
-    </div>
-  );
+  return tabs.map(({ id, label, icon: Icon }) => (
+      <button
+        key={id}
+        onClick={() => onTabChange(id)}
+        className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors
+          ${activeTab === id 
+            ? 'text-blue-600 border-b-2 border-blue-600' 
+            : 'text-gray-600 hover:text-blue-600'
+          }`}
+      >
+        <Icon size={20} />
+        {label}
+      </button>
+    ))
 }
