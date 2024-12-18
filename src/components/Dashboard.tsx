@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import TabNavigation from './TabNavigation';
+import { NavigationBar } from './navigation/NavigationBar';
 import KeywordInput from './keyword/KeywordInput';
 import PortfolioInput from './PortfolioInput';
 import TrafficChart from './TrafficChart';
 import { TrafficStats } from './chart/TrafficStats';
 import { TrafficTable } from './chart/TrafficTable';
 import PositionChart from './PositionChart';
-import StateManagement from './StateManagement';
 import { SeasonalityControls } from './seasonality/SeasonalityControls';
-import { Keyword, Portfolio, TrafficData } from '../types';
+import { Keyword, Portfolio, TrafficData, AppState } from '../types';
 import { calculateMonthlyTraffic } from '../utils/trafficCalculator';
 import { DEFAULT_SEASONALITY } from '../utils/seasonality';
-import { BarChart } from 'lucide-react';
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState('keywords');
   const [seasonality, setSeasonality] = useState(DEFAULT_SEASONALITY);
   const [startMonth, setStartMonth] = useState(0);
-
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [trafficData, setTrafficData] = useState<TrafficData[]>([]);
@@ -41,7 +38,6 @@ function Dashboard() {
       };
     });
 
-    // Only update if the tags have actually changed
     const tagsChanged = taggedKeywords.some((newKeyword, index) => {
       const oldKeyword = keywords[index];
       return !oldKeyword || 
@@ -51,11 +47,10 @@ function Dashboard() {
     if (tagsChanged) {
       setKeywords(taggedKeywords);
     }
-  }, [portfolios, keywords]); // Include keywords in dependency array
+  }, [portfolios, keywords]);
 
   // Handle raw keyword updates separately
   const handleKeywordsChange = (newKeywords: Keyword[]) => {
-    // Tag the new keywords before setting them
     const taggedKeywords = newKeywords.map(keyword => ({
       ...keyword,
       portfolioTags: portfolios
@@ -90,13 +85,29 @@ function Dashboard() {
     });
   };
 
+  const handleStateImport = (state: AppState) => {
+    setKeywords(state.keywords);
+    setPortfolios(state.portfolios);
+    setSeasonality(state.seasonality);
+    setStartMonth(state.startMonth);
+  };
+
+  const currentAppState: AppState = {
+    keywords,
+    portfolios,
+    seasonality,
+    startMonth
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-8 py-4">
-          <TabNavigation 
+          <NavigationBar 
             activeTab={activeTab}
             onTabChange={setActiveTab}
+            appState={currentAppState}
+            onStateImport={handleStateImport}
           />
         </div>
       </header>
